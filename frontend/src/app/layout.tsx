@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import "@mantine/core/styles.css";
-import ClientWrapper from "@/components/Common/ClientWrapper";
+import ClientWrapper from "@/components/ClientWrapper";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import "./globals.css";
+import "@mantine/core/styles.css";
+import '@mantine/dates/styles.css';
 
 const inter = Inter({
   subsets: ["latin"],

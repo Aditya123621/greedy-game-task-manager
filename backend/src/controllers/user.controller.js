@@ -38,7 +38,7 @@ export const uploadProfileImage = async (req, res) => {
         .json({ success: false, message: "No file uploaded" });
     }
 
-    const host = `${req.protocol}://${req.get("host")}`; // e.g. http://localhost:8000
+    const host = `${req.protocol}://${req.get("host")}`;
     const imagePath = `${host}/uploads/${req.file.filename}`;
 
     const user = await User.findByIdAndUpdate(

@@ -97,14 +97,22 @@ export default function SignUp() {
                 value: 2,
                 message: "Name must be at least 2 characters",
               },
+              maxLength: {
+                value: 50,
+                message: "Name must be at most 50 characters",
+              },
+              validate: (value) => {
+                if (value.trim().length === 0)
+                  return "Full name cannot be empty";
+                return true;
+              },
             }}
             render={({ field }) => (
               <TextInput
                 {...field}
                 placeholder="John Doe"
-                // error={errors.fullName?.message}
                 withAsterisk
-                label={"Full name"}
+                label="Full name"
               />
             )}
           />
@@ -125,7 +133,6 @@ export default function SignUp() {
                 placeholder="Example@site.com"
                 withAsterisk
                 label="Email Address"
-                // error={errors.email?.message}
               />
             )}
           />
@@ -146,7 +153,6 @@ export default function SignUp() {
                 placeholder="Minimum 8 characters"
                 label="Password"
                 withAsterisk
-                // error={errors.password?.message}
               />
             )}
           />

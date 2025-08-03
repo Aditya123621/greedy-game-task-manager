@@ -8,7 +8,10 @@
 
 .mantine-Input-input::placeholder,
 .mantine-PasswordInput-innerInput::placeholder,
-.mantine-TagsInput-inputField::placeholder {
+.mantine-TagsInput-inputField::placeholder,
+.mantine-DateInput-input::placeholder,
+.mantine-Textarea-input::placeholder,
+.mantine-TimeInput-input::placeholder {
   font-size: 14px !important;
 }
 

@@ -35,7 +35,7 @@ export default function Header() {
 
   const handleClickProfile = () => {
     setOpened(false);
-    dispatch(openDrawer({ type: "profile", data: { name: "Aditya" } }));
+    dispatch(openDrawer({ type: "profile" }));
   };
   const buttonConfigs = [
     {

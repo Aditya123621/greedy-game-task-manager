@@ -4,7 +4,8 @@ import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { closeDrawer } from "@/store/slices/drawerSlice";
-import ProfileDrawer from "../ProfileDrawer";
+import ProfileDrawer from "./ProfileDrawer";
+import AddTodo from "./AddTodo";
 
 const NotificationView = () => <div>You have new notifications.</div>;
 
@@ -12,13 +13,11 @@ const TodoDetailView = ({ data }: { data?: unknown }) => (
   <div>Todo Detail: {JSON.stringify(data)}</div>
 );
 
-const AddTodoView = () => <div>Add Todo Form (to be implemented)</div>;
-
 const drawerComponents: Record<string, FC<{ data?: unknown }>> = {
   profile: ProfileDrawer,
   notification: NotificationView,
   todo_detail: TodoDetailView,
-  add_todo: AddTodoView,
+  add_todo: AddTodo,
 };
 
 const DrawerContainer = () => {
@@ -42,7 +41,7 @@ const DrawerContainer = () => {
       case "todo_detail":
         return "Todo Details";
       case "add_todo":
-        return "Add New Todo";
+        return "Add Todo";
       default:
         return "";
     }
@@ -50,16 +49,15 @@ const DrawerContainer = () => {
 
   return (
     <Drawer
-      opened={opened || true}
+      opened={opened}
       onClose={handleDrawerClose}
       title={getTitle()}
       position="right"
       classNames={{
-        title: "! text-custom-primary-black !font-semibold !text-2xl",
+        title: "!text-custom-primary-black !font-semibold !text-2xl",
       }}
     >
-      {/* {ContentComponent ? <ContentComponent data={data} /> : null} */}
-      <ProfileDrawer />
+      {ContentComponent ? <ContentComponent data={data} /> : null}
     </Drawer>
   );
 };

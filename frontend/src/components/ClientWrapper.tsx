@@ -8,9 +8,10 @@ import {
   PasswordInput,
   Popover,
   Select,
+  Textarea,
   TextInput,
 } from "@mantine/core";
-import { DateInput, DatePickerInput } from "@mantine/dates";
+import { DateInput, DatePickerInput, TimeInput } from "@mantine/dates";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { Provider as ReduxProvider } from "react-redux";
@@ -52,7 +53,6 @@ function ClientWrapper({
     nextIcon: <AngleArrow height={12} width={12} />,
     previousIcon: <AngleArrow height={12} width={12} className="rotate-180" />,
     clearable: true,
-    rightSection: <CalenderIcon />,
     classNames: {
       calendarHeaderLevel: "!text-gray-2 !font-semibold",
       weekday: "!text-gray-light !text-xs !uppercase !tracking-widest",
@@ -61,10 +61,12 @@ function ClientWrapper({
   };
 
   const commonDateInputClassNames = {
+    label: "!font-normal !text-sm !text-custom-primary-black",
     day: "!font-medium !text-base !rounded-full !text-gray-2 data-[selected]:!text-white",
   };
 
   const commonDatePickerInputClassNames = {
+    label: "!font-normal !text-sm !text-custom-primary-black",
     day: "!font-medium !text-base !text-gray-2 data-[selected]:!text-white",
   };
   const theme = createTheme({
@@ -86,6 +88,26 @@ function ClientWrapper({
     primaryColor: "primary",
     components: {
       TextInput: TextInput.extend({
+        defaultProps: {
+          size: "lg",
+          classNames: {
+            input: "!text-sm",
+            label: "!font-normal !text-sm !text-custom-primary-black",
+            error: "!text-xs",
+          },
+        },
+      }),
+      Textarea: Textarea.extend({
+        defaultProps: {
+          size: "lg",
+          classNames: {
+            input: "!text-sm",
+            label: "!font-normal !text-sm !text-custom-primary-black",
+            error: "!text-xs",
+          },
+        },
+      }),
+      TimeInput: TimeInput.extend({
         defaultProps: {
           size: "lg",
           classNames: {

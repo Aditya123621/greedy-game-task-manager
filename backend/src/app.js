@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
+import todoRoutes from "./routes/todo.route.js";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
@@ -23,6 +24,7 @@ app.use(cookieParser());
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use("/api/todos", todoRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ success: true, message: "Server is running" });
