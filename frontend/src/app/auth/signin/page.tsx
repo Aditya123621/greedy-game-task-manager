@@ -38,7 +38,7 @@ export default function SignIn() {
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        rememberMe: data.rememberMe?.toString(), 
+        rememberMe: data.rememberMe?.toString(),
         redirect: false,
       });
 
@@ -63,7 +63,7 @@ export default function SignIn() {
       <div className="text-center">
         <div className="flex items-center justify-center mb-6">
           <Image
-            src={"/icons/greedy-game-logo.svg"}
+            src={"/images/greedy-game-logo.svg"}
             width={140}
             height={140}
             alt="company-logo"
@@ -119,14 +119,9 @@ export default function SignIn() {
                 <TextInput
                   {...field}
                   placeholder="Enter your registered email"
-                  size="lg"
                   label={"Email Address"}
                   withAsterisk
                   error={errors.email?.message}
-                  classNames={{
-                    label: "!font-normal !text-sm !text-custom-primary-black",
-                    error: "!text-xs",
-                  }}
                 />
               )}
             />
@@ -147,14 +142,9 @@ export default function SignIn() {
                 <PasswordInput
                   {...field}
                   placeholder="Enter your password"
-                  size="lg"
                   label={"Password"}
                   withAsterisk
                   error={errors.password?.message}
-                  classNames={{
-                    label: "!font-normal !text-sm !text-custom-primary-black",
-                    error: "!text-xs",
-                  }}
                 />
               )}
             />

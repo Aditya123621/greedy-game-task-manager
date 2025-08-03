@@ -53,7 +53,7 @@ export default function SignUp() {
       <div className="text-center">
         <div className="flex items-center justify-center">
           <Image
-            src={"/icons/greedy-game-logo.svg"}
+            src={"/images/greedy-game-logo.svg"}
             width={140}
             height={140}
             alt="company-logo"
@@ -102,14 +102,9 @@ export default function SignUp() {
               <TextInput
                 {...field}
                 placeholder="John Doe"
-                size="lg"
                 // error={errors.fullName?.message}
                 withAsterisk
                 label={"Full name"}
-                classNames={{
-                  label: "!font-normal !text-sm !text-custom-primary-black",
-                  input: `${errors.fullName?.message ? "!border-red-500" : ""}`,
-                }}
               />
             )}
           />
@@ -127,15 +122,10 @@ export default function SignUp() {
             render={({ field }) => (
               <TextInput
                 {...field}
-                placeholder="john.doe@example.com"
-                size="lg"
+                placeholder="Example@site.com"
                 withAsterisk
                 label="Email Address"
                 // error={errors.email?.message}
-                classNames={{
-                  label: "!font-normal !text-sm !text-custom-primary-black",
-                  input: `${errors.email?.message ? "!border-red-500" : ""}`,
-                }}
               />
             )}
           />
@@ -146,22 +136,17 @@ export default function SignUp() {
             rules={{
               required: "Password is required",
               minLength: {
-                value: 6,
-                message: "Password must be at least 6 characters",
+                value: 8,
+                message: "Password must be at least 8 characters",
               },
             }}
             render={({ field }) => (
               <PasswordInput
                 {...field}
-                placeholder="Minimum 6 characters"
-                size="lg"
+                placeholder="Minimum 8 characters"
                 label="Password"
                 withAsterisk
                 // error={errors.password?.message}
-                classNames={{
-                  label: "!font-normal !text-sm !text-custom-primary-black",
-                  input: `${errors.password?.message ? "!border-red-500" : ""}`,
-                }}
               />
             )}
           />

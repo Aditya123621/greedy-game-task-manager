@@ -8,6 +8,7 @@ import {
   PasswordInput,
   Popover,
   Select,
+  TextInput,
 } from "@mantine/core";
 import { DateInput, DatePickerInput } from "@mantine/dates";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -42,6 +43,7 @@ function ClientWrapper({
         },
       })
   );
+
   const commonDateProps = {
     firstDayOfWeek: 0 as DayOfWeek,
     valueFormat: "MMM DD, YYYY",
@@ -83,6 +85,16 @@ function ClientWrapper({
     fontFamily: "var(--font-inter), sans-serif",
     primaryColor: "primary",
     components: {
+      TextInput: TextInput.extend({
+        defaultProps: {
+          size: "lg",
+          classNames: {
+            input: "!text-sm",
+            label: "!font-normal !text-sm !text-custom-primary-black",
+            error: "!text-xs",
+          },
+        },
+      }),
       Select: Select.extend({
         defaultProps: {
           rightSection: <AngleArrow />,
@@ -103,9 +115,15 @@ function ClientWrapper({
       }),
       PasswordInput: PasswordInput.extend({
         defaultProps: {
+          size: "lg",
           visibilityToggleIcon: ({ reveal }) => (
             <VisibilityToggleIcon reveal={reveal} />
           ),
+          classNames: {
+            input: "!text-sm",
+            label: "!font-normal !text-sm !text-custom-primary-black",
+            error: "!text-xs",
+          },
         },
       }),
       MultiSelect: MultiSelect.extend({

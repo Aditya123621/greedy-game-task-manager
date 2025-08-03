@@ -2,11 +2,16 @@
 
 @theme {
   --color-custom-red-1: #e03137;
-  --color-custom-primary-black: #21252B;
+  --color-custom-primary-black: #21252b;
+  --max-width-8xl: 1920px;
 }
 
 .mantine-Input-input::placeholder,
 .mantine-PasswordInput-innerInput::placeholder,
 .mantine-TagsInput-inputField::placeholder {
   font-size: 14px !important;
+}
+
+button {
+  cursor: pointer;
 }
