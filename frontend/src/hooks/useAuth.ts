@@ -1,10 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-import api from "@/lib/api";
 import { setUser, clearUser } from "@/store/slices/authSlice";
 import { User } from "@/store/slices/authSlice";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import apiEndPoints from "@/services/apiEndpoint";
+import axios from "axios";
+import { joinUrl } from "@/utils/joinUrl";
 
 interface RegisterData {
   name: string;
@@ -25,7 +27,10 @@ export const useAuth = () => {
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterData): Promise<AuthResponse> => {
-      const response = await api.post("/auth/register", data);
+      const response = await axios.post(
+        joinUrl(process.env.NEXT_PUBLIC_BACKEND_BASEURL!, apiEndPoints.SIGN_UP),
+        data
+      );
       return response.data;
     },
     onSuccess: async (data, variables) => {
@@ -49,7 +54,9 @@ export const useAuth = () => {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.post("/auth/logout");
+      const response = await axios.post(
+        joinUrl(process.env.NEXT_PUBLIC_BACKEND_BASEURL!, apiEndPoints.LOG_OUT)
+      );
       return response.data;
     },
     onSuccess: () => {

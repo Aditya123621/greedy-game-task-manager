@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { openDrawer } from "@/store/slices/drawerSlice";
+import apiEndPoints from "@/services/apiEndpoint";
 
 export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,7 +25,7 @@ export default function Header() {
     setLoadingLogout(true);
     try {
       await logout();
-      await signOut({ callbackUrl: "/auth/signin" });
+      await signOut({ callbackUrl: apiEndPoints.SIGN_IN });
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {

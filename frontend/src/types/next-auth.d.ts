@@ -1,4 +1,5 @@
 import "next-auth";
+import "next-auth/jwt";
 
 declare module "next-auth" {
   interface Session {
@@ -10,8 +11,8 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       role: "user" | "super_admin";
-      createdAt: string; 
-      updatedAt: string; 
+      createdAt: string;
+      updatedAt: string;
     };
   }
 
@@ -20,8 +21,12 @@ declare module "next-auth" {
     token?: string;
     rememberMe?: boolean;
     role?: "user" | "super_admin";
-    createdAt?: string; 
+    createdAt?: string;
     updatedAt?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    avatar?: string | null;
   }
 }
 
@@ -29,8 +34,9 @@ declare module "next-auth/jwt" {
   interface JWT {
     backendToken?: string;
     rememberMe?: boolean;
-    createdAt?: string; 
-    updatedAt?: string; 
+    createdAt?: string;
+    updatedAt?: string;
+    id?: string;
     user?: {
       _id: string;
       name: string;
@@ -39,7 +45,7 @@ declare module "next-auth/jwt" {
       googleId?: string;
       role: "user" | "super_admin";
       createdAt: string;
-      updatedAt: string; 
+      updatedAt: string;
     };
   }
 }

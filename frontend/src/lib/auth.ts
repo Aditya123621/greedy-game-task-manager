@@ -2,6 +2,8 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
+import apiEndPoints from "@/services/apiEndpoint";
+import { joinUrl } from "@/utils/joinUrl";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,10 +16,13 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-
+        console.log(
+          joinUrl(process.env.NEXT_PUBLIC_BACKEND_BASEURL!, apiEndPoints.SIGN_IN),
+          "jointntntntntn"
+        );
         try {
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
+            joinUrl(process.env.NEXT_PUBLIC_BACKEND_BASEURL!, apiEndPoints.SIGN_IN),
             {
               email: credentials.email,
               password: credentials.password,
@@ -35,8 +40,8 @@ export const authOptions: NextAuthOptions = {
               token: token,
               rememberMe: credentials.rememberMe === "true",
               role: user.role,
-              createdAt: user.createdAt, 
-              updatedAt: user.updatedAt, 
+              createdAt: user.createdAt,
+              updatedAt: user.updatedAt,
             };
           }
 
@@ -64,7 +69,7 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === "google" && user) {
         try {
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google/callback`,
+            `${process.env.NEXT_PUBLIC_BACKEND_BASEURL}/auth/google/callback`,
             {
               googleId: user.id,
               email: user.email,

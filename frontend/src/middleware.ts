@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import apiEndPoints from "./services/apiEndpoint";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -16,7 +17,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    const signInUrl = new URL("/auth/signin", request.url);
+    const signInUrl = new URL(apiEndPoints.SIGN_IN, request.url);
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
   }
