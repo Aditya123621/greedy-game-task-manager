@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --color-custom-red-1: #e03137;
+  --color-custom-primary-black: #21252B;
+}
+
+.mantine-Input-input::placeholder,
+.mantine-PasswordInput-innerInput::placeholder,
+.mantine-TagsInput-inputField::placeholder {
+  font-size: 14px !important;
+}
