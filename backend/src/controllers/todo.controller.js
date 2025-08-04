@@ -31,3 +31,54 @@ export const createTodo = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getTodos = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      status = "",
+      sortBy = "dueDate",
+      sortOrder = "asc",
+    } = req.query;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const filter = {};
+    if (search) {
+      filter.title = { $regex: search, $options: "i" };
+    }
+    if (status) {
+      filter.status = status;
+    }
+
+    const sort = {
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+    };
+
+    const [todos, total] = await Promise.all([
+      Todo.find(filter).sort(sort).skip(skip).limit(parseInt(limit)),
+      Todo.countDocuments(filter),
+    ]);
+
+    const hasMore = skip + todos.length < total;
+
+    const pendingCount = await Todo.countDocuments({ status: "Pending" });
+    const completedCount = await Todo.countDocuments({ status: "Completed" });
+    const totalCount = pendingCount + completedCount;
+
+    res.json({
+      todos,
+      hasMore,
+      stats: {
+        total: totalCount,
+        pending: pendingCount,
+        completed: completedCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching todos:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

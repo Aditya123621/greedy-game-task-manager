@@ -13,6 +13,8 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { openDrawer } from "@/store/slices/drawerSlice";
 import apiEndPoints from "@/services/apiEndpoint";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { setSearch } from "@/store/slices/todoSlice";
 
 export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +22,10 @@ export default function Header() {
   const [opened, setOpened] = useState<boolean>(false);
   const { logout } = useAuth();
   const [loadingLogout, setLoadingLogout] = useState(false);
+
+  const debouncedDispatch = useDebouncedCallback((val: string) => {
+    dispatch(setSearch(val));
+  }, 300);
 
   const handleLogout = async () => {
     setLoadingLogout(true);
@@ -51,6 +57,7 @@ export default function Header() {
       onClick: handleLogout,
     },
   ];
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm px-4 py-3 h-18">
       <div className="max-w-8xl mx-auto flex items-center justify-between">
@@ -62,9 +69,13 @@ export default function Header() {
           <TextInput
             size="md"
             placeholder="Search"
+            onChange={(e) => {
+              const val = e.currentTarget.value;
+              debouncedDispatch(val);
+            }}
             leftSection={<SearchIcon className="size-5" />}
             classNames={{
-              input: " !bg-[#FAFAFA]",
+              input: "!bg-[#FAFAFA]",
             }}
           />
         </div>

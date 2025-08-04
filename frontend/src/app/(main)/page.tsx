@@ -1,177 +1,243 @@
 "use client";
-import { Button, Table } from "@mantine/core";
-import React, { useMemo } from "react";
+
+import {
+  Button,
+  Table,
+  Skeleton,
+  Text,
+  Alert,
+  Badge,
+  ActionIcon,
+  Loader,
+} from "@mantine/core";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import FilterIcon from "@@/icons/filter-icon.svg";
 import AddIcon from "@@/icons/add-icon.svg";
 import EditIcon from "@@/icons/edit-icon-2.svg";
 import DeleteIcon from "@@/icons/delete-icon.svg";
+import SortIcon from "@@/icons/sort-icon.svg";
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
   createColumnHelper,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 import { openDrawer } from "@/store/slices/drawerSlice";
+import { useGetListQuery } from "@/hooks/useTodos";
+import { TodoItem } from "@/types/todo";
+import { TruncateAndProvideTooltip } from "@/components/TruncateAndProvideTooltip";
+import { useGetUserInfo } from "@/hooks/useUserProfile";
+import dayjs from "dayjs";
+import { getStatusStyle } from "@/utils/getBadgeColor";
 
 const Dashboard = () => {
-  const todos = [
-    {
-      id: 1,
-      title: "Submit project report",
-      description:
-        "Submit and submit the quarterly project report to the manager by...",
-      dueDate: "16/08/2023",
-      dueTime: "18:00",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      title: "Team stand-up meeting",
-      description:
-        "Join the daily stand-up meeting with the product team on Zoom",
-      dueDate: "16/08/2023",
-      dueTime: "18:00",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      title: "Client follow-up email",
-      description:
-        "Craft and send the follow-up email to the client regarding the new...",
-      dueDate: "16/08/2023",
-      dueTime: "18:00",
-      status: "Pending",
-    },
-    {
-      id: 4,
-      title: "Review pull requests",
-      description:
-        "Check and review the pending pull requests on GitHub before 5:00...",
-      dueDate: "16/08/2023",
-      dueTime: "18:00",
-      status: "Completed",
-    },
-    {
-      id: 5,
-      title: "Buy groceries",
-      description:
-        "Pick up essentials like vegetables, milk, and bread from the nearby...",
-      dueDate: "16/08/2023",
-      dueTime: "18:00",
-      status: "Pending",
-    },
-    {
-      id: 6,
-      title: "Workout session",
-      description: "Attend the 7:00 PM virtual HR1 workout class scheduled.",
-      dueDate: "16/08/2023",
-      dueTime: "18:00",
-      status: "Completed",
-    },
-  ];
-
+  const { data: userInfo } = useGetUserInfo();
   const dispatch = useDispatch<AppDispatch>();
+  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const search = useSelector((state: RootState) => state.todo.search);
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "",
+    sortBy: "dueDate",
+    sortOrder: "asc",
+  });
 
-  const todoStats = [
-    { label: "All Todos", count: 12 },
-    { label: "Upcoming", count: 4 },
-    { label: "Completed", count: 6 },
-  ];
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetListQuery(filters);
 
-  const getStatusBadgeColor = (status) => {
-    return status === "Completed"
-      ? "bg-green-100 text-green-700"
-      : "bg-yellow-100 text-yellow-700";
-  };
+  const todos = useMemo(
+    () => (data ? data.pages.flatMap((page) => page.todos) : []),
+    [data]
+  );
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, search }));
+  }, [search]);
 
-  const columnHelper = createColumnHelper();
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+
+    if (observerRef.current) observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
+  const columnHelper = createColumnHelper<TodoItem>();
 
   const columns = useMemo(
     () => [
       columnHelper.accessor("title", {
-        header: "Task",
+        header: "Todo",
+        size: 300,
         cell: (info) => (
-          <div className="max-w-xs">
-            <h3 className="font-medium text-gray-900 mb-1">
-              {info.getValue()}
-            </h3>
-            <p className="text-sm text-gray-500 line-clamp-2">
-              {info.row.original.description}
-            </p>
+          <div className="">
+            <TruncateAndProvideTooltip
+              text={info.getValue()}
+              className="font-medium text-custom-primary-black "
+            />
+            <TruncateAndProvideTooltip
+              text={info.row.original.description}
+              className="text-sm text-[#989FAB] "
+            />
           </div>
         ),
       }),
       columnHelper.accessor("dueDate", {
-        header: "Due Date",
+        header: ({ column }) => (
+          <SortableHeader
+            label="Due Date"
+            direction={column.getIsSorted()}
+            onClick={() => column.toggleSorting()}
+          />
+        ),
+        size: 150,
+        enableSorting: true,
         cell: (info) => (
-          <div className="text-sm text-gray-600">
-            <div>{info.getValue()}</div>
-            <div>{info.row.original.dueTime}</div>
+          <div className="max-w-xs">
+            <TruncateAndProvideTooltip
+              text={dayjs(info.getValue()).format("DD/MM/YYYY")}
+              className=" text-[#071631] "
+            />
+            <TruncateAndProvideTooltip
+              text={info.row.original.dueTime}
+              className=" text-[#071631] "
+            />
           </div>
         ),
       }),
       columnHelper.accessor("status", {
-        header: "Status",
+        header: ({ column }) => (
+          <SortableHeader
+            label="Status"
+            direction={column.getIsSorted()}
+            onClick={() => column.toggleSorting()}
+          />
+        ),
+        size: 120,
+        enableSorting: true,
         cell: (info) => {
-          const status = info.getValue();
+          const status = info.getValue().toLocaleLowerCase();
+          const { label, text, bg } = getStatusStyle(status);
           return (
-            <span
-              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(
-                status
-              )}`}
+            <Badge
+              size="lg"
+              color={bg}
+              classNames={{
+                label: `${text} !font-normal`,
+                root: "!normal-case",
+              }}
             >
-              {status}
-            </span>
+              {label}
+            </Badge>
           );
         },
       }),
       columnHelper.display({
         id: "actions",
         header: "Actions",
+        size: 100,
         cell: () => (
           <div className="flex items-center gap-2">
-            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+            <ActionIcon color="#F4EFFF">
               <EditIcon className="size-4" />
-            </button>
-            <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+            </ActionIcon>
+            <ActionIcon color="#FEE9F1">
               <DeleteIcon className="size-4" />
-            </button>
+            </ActionIcon>
           </div>
         ),
       }),
     ],
-    []
+    [columnHelper]
   );
 
-  const table = useReactTable({
+  const table = useReactTable<TodoItem>({
     data: todos,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    enableColumnResizing: false,
+    columnResizeMode: "onChange",
+    defaultColumn: {
+      size: 150,
+      minSize: 50,
+      maxSize: 400,
+    },
+    state: {
+      sorting,
+    },
+    onSortingChange: (updater) => {
+      const newSorting =
+        typeof updater === "function" ? updater(sorting) : updater;
+      setSorting(newSorting);
+
+      const sort = newSorting[0];
+      setFilters((prev) => ({
+        ...prev,
+        sortBy: sort?.id || "dueDate",
+        sortOrder: sort?.desc ? "desc" : "asc",
+      }));
+    },
   });
 
   return (
-    <div className="bg-[#FAFAFA] p-10 flex flex-col gap-6">
-      <h1 className="text-[#111827] font-bold text-2xl">Hello, Aditya</h1>
+    <div className="bg-[#FAFAFA] p-10 flex flex-col gap-6 flex-auto">
+      {!userInfo?.name ? (
+        <Skeleton height={32} width={200} radius="sm" />
+      ) : (
+        <TruncateAndProvideTooltip
+          text={`Hello, ${userInfo.name}`}
+          className="text-[#111827] font-bold text-2xl"
+        />
+      )}
 
       <div className="bg-white py-4 !rounded-lg shadow-sm overflow-hidden">
         <div className="grid grid-cols-5 divide-x divide-gray-200">
-          {todoStats.map((stat, idx) => (
-            <div key={idx} className="bg-white px-6 py-2">
-              <h3 className="text-gray-500 text-sm font-medium mb-1">
-                {stat.label}
-              </h3>
-              <p className="text-3xl font-semibold text-custom-primary-black">
-                {stat.count}
-              </p>
-            </div>
-          ))}
+          {isLoading
+            ? [1, 2, 3].map((_, idx) => (
+                <div key={idx} className="bg-white px-6 py-2 space-y-2">
+                  <Skeleton height={16} width={80} radius="sm" />
+                  <Skeleton height={32} width={60} radius="sm" />
+                </div>
+              ))
+            : [
+                { label: "All Todos", count: data?.pages[0]?.stats?.total },
+                {
+                  label: "Pending",
+                  count: data?.pages[0]?.stats?.pending,
+                },
+                {
+                  label: "Completed",
+                  count: data?.pages[0]?.stats?.completed,
+                },
+              ].map((stat, idx) => (
+                <div key={idx} className="bg-white px-6 py-2">
+                  <h3 className="text-gray-500 text-sm font-medium mb-1">
+                    {stat.label}
+                  </h3>
+                  <p className="text-3xl font-semibold text-custom-primary-black">
+                    {stat.count}
+                  </p>
+                </div>
+              ))}
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex items-center justify-between mb-2">
+      <div className="bg-white rounded-lg shadow-sm p-6 flex-auto flex flex-col">
+        <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-custom-primary-black">
             All Todos
           </h2>
@@ -197,43 +263,117 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <Table.ScrollContainer minWidth={700}>
-          <Table highlightOnHover>
-            <Table.Thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <Table.Tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <Table.Th key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </Table.Th>
-                  ))}
-                </Table.Tr>
-              ))}
-            </Table.Thead>
-            <Table.Tbody>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Td key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </Table.Td>
-                  ))}
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
+        {isLoading ? (
+          <Skeleton height={300} />
+        ) : isError ? (
+          <Alert color="red">Failed to load todos</Alert>
+        ) : todos.length === 0 ? (
+          <div className="flex-auto text-3xl flex justify-center items-center">
+            No Data found
+          </div>
+        ) : (
+          <Table.ScrollContainer minWidth={700}>
+            <Table
+              highlightOnHover
+              classNames={{
+                thead: "!bg-[#FAFAFA] ",
+                td: "!border-b !border-dashed !border-[#E6E7EA]",
+              }}
+              verticalSpacing="md"
+              withRowBorders={false}
+              style={{
+                tableLayout: "fixed",
+                width: "100%",
+              }}
+            >
+              <Table.Thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <Table.Tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <Table.Th
+                        key={header.id}
+                        style={{
+                          width: header.getSize(),
+                          minWidth: header.getSize(),
+                          maxWidth: header.getSize(),
+                        }}
+                      >
+                        {header.isPlaceholder ? null : (
+                          <div className="text-[#657081] font-medium text-base inline-block">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                          </div>
+                        )}
+                      </Table.Th>
+                    ))}
+                  </Table.Tr>
+                ))}
+              </Table.Thead>
+              <Table.Tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <Table.Tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <Table.Td
+                        key={cell.id}
+                        style={{
+                          width: cell.column.getSize(),
+                          minWidth: cell.column.getSize(),
+                          maxWidth: cell.column.getSize(),
+                        }}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </Table.Td>
+                    ))}
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+            <div
+              ref={observerRef}
+              className="h-10 flex justify-center items-center"
+            >
+              {isFetchingNextPage && (
+                <Loader size="lg" color="primary" type="dots" />
+              )}
+            </div>
+          </Table.ScrollContainer>
+        )}
       </div>
     </div>
   );
 };
+
+const SortableHeader = ({
+  label,
+  direction,
+  onClick,
+}: {
+  label: string;
+  direction: false | "asc" | "desc";
+  onClick: () => void;
+}) => (
+  <div
+    className="flex items-center gap-1 cursor-pointer select-none"
+    onClick={onClick}
+  >
+    <span>{label}</span>
+    <div
+      className={`transform transition-transform duration-300 ${
+        direction === "asc"
+          ? "rotate-180"
+          : direction === "desc"
+          ? "rotate-0"
+          : "opacity-30"
+      }`}
+    >
+      <SortIcon className="size-4" />
+    </div>
+  </div>
+);
 
 export default Dashboard;

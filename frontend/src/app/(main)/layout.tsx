@@ -9,7 +9,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
       <Toaster position="top-right" reverseOrder={false} />
       <DrawerContainer />
       <Header />
-      <div className="pt-18 min-h-screen max-w-8xl mx-auto">{children}</div>
+      <div className="pt-18 min-h-screen max-w-8xl mx-auto flex flex-col">{children}</div>
     </>
   );
 };
