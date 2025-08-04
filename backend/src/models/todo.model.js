@@ -24,8 +24,8 @@ const todoSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Completed"],
-      default: "Pending",
+      enum: ["Upcoming", "Completed"],
+      default: "Upcoming",
     },
   },
   { timestamps: true }

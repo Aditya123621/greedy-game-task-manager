@@ -4,7 +4,7 @@ export interface TodoItem {
   description: string;
   dueDate: string;
   dueTime: string;
-  status: "Pending" | "Completed";
+  status: "Upcoming" | "Completed";
   createdAt: string;
   updatedAt: string;
 }

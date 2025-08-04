@@ -27,14 +27,16 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { openDrawer } from "@/store/slices/drawerSlice";
-import { useGetListQuery } from "@/hooks/useTodos";
+import { useDeleteTodo, useGetListQuery } from "@/hooks/useTodos";
 import { TodoItem } from "@/types/todo";
 import { TruncateAndProvideTooltip } from "@/components/TruncateAndProvideTooltip";
 import { useGetUserInfo } from "@/hooks/useUserProfile";
 import dayjs from "dayjs";
 import { getStatusStyle } from "@/utils/getBadgeColor";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Dashboard = () => {
+  const queryClient = useQueryClient();
   const { data: userInfo } = useGetUserInfo();
   const dispatch = useDispatch<AppDispatch>();
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -46,6 +48,7 @@ const Dashboard = () => {
     sortBy: "dueDate",
     sortOrder: "asc",
   });
+  const { mutate: deleteTodo } = useDeleteTodo();
 
   const {
     data,
@@ -149,13 +152,30 @@ const Dashboard = () => {
         id: "actions",
         header: "Actions",
         size: 100,
-        cell: () => (
+        cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <ActionIcon color="#F4EFFF">
-              <EditIcon className="size-4" />
+            <ActionIcon
+              color="#F4EFFF"
+              onClick={() => {
+                const todoId = row.original._id;
+                queryClient.invalidateQueries({ queryKey: ["todo", todoId] });
+                dispatch(
+                  openDrawer({
+                    type: "todo_detail",
+                    data: { id: todoId },
+                  })
+                );
+              }}
+            >
+              <EditIcon className="size-4 text-[#8C62FF]" />
             </ActionIcon>
-            <ActionIcon color="#FEE9F1">
-              <DeleteIcon className="size-4" />
+            <ActionIcon
+              color="#FEE9F1"
+              onClick={() => {
+                deleteTodo(row.original._id);
+              }}
+            >
+              <DeleteIcon className="size-4 text-[#F44E8B]" />
             </ActionIcon>
           </div>
         ),
@@ -214,14 +234,17 @@ const Dashboard = () => {
                 </div>
               ))
             : [
-                { label: "All Todos", count: data?.pages[0]?.stats?.total },
                 {
-                  label: "Pending",
-                  count: data?.pages[0]?.stats?.pending,
+                  label: "All Todos",
+                  count: data?.pages[0]?.stats?.total ?? 0,
+                },
+                {
+                  label: "Upcoming",
+                  count: data?.pages[0]?.stats?.upcoming ?? 0,
                 },
                 {
                   label: "Completed",
-                  count: data?.pages[0]?.stats?.completed,
+                  count: data?.pages[0]?.stats?.completed ?? 0,
                 },
               ].map((stat, idx) => (
                 <div key={idx} className="bg-white px-6 py-2">

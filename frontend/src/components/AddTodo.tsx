@@ -1,47 +1,71 @@
 "use client";
 
-import { TextInput, Textarea, Button, ActionIcon } from "@mantine/core";
+import { TextInput, Textarea, Button, ActionIcon, Select } from "@mantine/core";
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import AddIcon from "@@/icons/add-icon.svg";
 import CalenderIcon from "@@/icons/calender-icon.svg";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import ClockIcon from "@@/icons/clock-icon.svg";
-import { useCreateTodo } from "@/hooks/useTodos";
+import { useCreateTodo, useGetTodoById, useUpdateTodo } from "@/hooks/useTodos";
+import EditIcon from "@@/icons/edit-icon-2.svg";
 
 interface TodoFormData {
   title: string;
   description: string;
   dueDate: string | null;
   dueTime: string | undefined;
+  status: string;
 }
 
-export default function AddTodo() {
+export default function AddTodo({ data }: { data: { id: string } }) {
+  const { data: todoData } = useGetTodoById(data?.id);
+  const { mutate: updateTodo } = useUpdateTodo();
   const ref = useRef<HTMLInputElement>(null);
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, dirtyFields },
   } = useForm<TodoFormData>({
     defaultValues: {
       title: "",
       description: "",
       dueDate: null,
       dueTime: "",
+      status: "",
     },
   });
   const { mutate: createTodo, isPending: todoPending } = useCreateTodo();
 
-  const onSubmit = (data: TodoFormData) => {
-    console.log(data, "Datatatata");
-    createTodo({
-      title: data.title.trim(),
-      description: data.description.trim(),
-      dueDate: data.dueDate as string,
-      dueTime: data.dueTime ?? "",
-    });
+  const onSubmit = (formData: TodoFormData) => {
+    console.log(formData, dirtyFields, "datadatadatadata");
+    if (data?.id) {
+      updateTodo({
+        id: data.id,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        dueDate: formData.dueDate as string,
+        dueTime: formData.dueTime ?? "",
+        status: formData.status,
+      });
+    } else {
+      createTodo({
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        dueDate: formData.dueDate as string,
+        dueTime: formData.dueTime ?? "",
+      });
+    }
   };
+
+  useEffect(() => {
+    if (todoData) {
+      const { title, description, dueDate, dueTime, status } = todoData;
+      reset({ description, title, dueTime, dueDate, status });
+    }
+  }, [reset, todoData]);
 
   return (
     <form
@@ -97,83 +121,109 @@ export default function AddTodo() {
           />
         )}
       />
+      {todoData?.status !== "Completed" && (
+        <>
+          <Controller
+            name="dueDate"
+            control={control}
+            rules={{
+              required: "Due date is required",
+              validate: (value, formValues) => {
+                if (!value || !formValues.dueTime)
+                  return "Both date and time are required";
 
-      <Controller
-        name="dueDate"
-        control={control}
-        rules={{
-          required: "Due date is required",
-          validate: (value, formValues) => {
-            if (!value || !formValues.dueTime)
-              return "Both date and time are required";
+                const [hour, minute] = formValues.dueTime?.split(":");
 
-            const [hour, minute] = formValues.dueTime?.split(":");
+                const dueDateTime = dayjs(value)
+                  .hour(Number(hour))
+                  .minute(Number(minute));
 
-            const dueDateTime = dayjs(value)
-              .hour(Number(hour))
-              .minute(Number(minute));
+                if (dueDateTime.isBefore(dayjs())) {
+                  return "Due date and time must be in the future";
+                }
 
-            if (dueDateTime.isBefore(dayjs())) {
-              return "Due date and time must be in the future";
-            }
-
-            return true;
-          },
-        }}
-        render={({ field }) => (
-          <DateInput
-            label="Due Date"
-            placeholder="Choose Due Date"
-            value={field.value}
-            withAsterisk
-            onChange={field.onChange}
-            error={errors.dueDate?.message}
-            leftSection={
-              <ActionIcon variant="transparent">
-                <CalenderIcon className="size-5" />
-              </ActionIcon>
-            }
-            minDate={new Date()}
-            leftSectionPointerEvents="none"
+                return true;
+              },
+            }}
+            render={({ field }) => (
+              <DateInput
+                label="Due Date"
+                placeholder="Choose Due Date"
+                value={field.value}
+                withAsterisk
+                onChange={field.onChange}
+                error={errors.dueDate?.message}
+                leftSection={
+                  <ActionIcon variant="transparent">
+                    <CalenderIcon className="size-5" />
+                  </ActionIcon>
+                }
+                minDate={new Date()}
+                leftSectionPointerEvents="none"
+              />
+            )}
           />
-        )}
-      />
 
-      <Controller
-        name="dueTime"
-        control={control}
-        rules={{
-          required: "Due time is required",
-          validate: (value) => (value ? true : "Due time is required"),
-        }}
-        render={({ field }) => (
-          <TimeInput
-            {...field}
-            label="Due Time"
-            placeholder="Choose Due Time"
-            withAsterisk
-            error={errors.dueTime?.message}
-            value={field.value}
-            onChange={(val) => field.onChange(val)}
-            leftSection={
-              <ActionIcon
-                variant="transparent"
-                onClick={() => ref.current?.showPicker()}
-              >
-                <ClockIcon className="size-5" />
-              </ActionIcon>
-            }
+          <Controller
+            name="dueTime"
+            control={control}
+            rules={{
+              required: "Due time is required",
+              validate: (value) => (value ? true : "Due time is required"),
+            }}
+            render={({ field }) => (
+              <TimeInput
+                {...field}
+                label="Due Time"
+                placeholder="Choose Due Time"
+                withAsterisk
+                error={errors.dueTime?.message}
+                value={field.value}
+                onChange={(val) => field.onChange(val)}
+                leftSection={
+                  <ActionIcon
+                    variant="transparent"
+                    onClick={() => ref.current?.showPicker()}
+                  >
+                    <ClockIcon className="size-5" />
+                  </ActionIcon>
+                }
+              />
+            )}
           />
-        )}
-      />
+        </>
+      )}
 
+      <div className={!data?.id ? "hidden" : ""}>
+        <Controller
+          name="status"
+          control={control}
+          rules={{ required: false }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              label="Select Status"
+              placeholder="Select Status"
+              allowDeselect={false}
+              data={["Upcoming", "Completed"]}
+              disabled={todoData?.status === "Completed"}
+            />
+          )}
+        />
+      </div>
       <div className="flex justify-end">
         <Button
           type="submit"
-          leftSection={<AddIcon className="size-3" />}
+          leftSection={
+            data?.id ? (
+              <EditIcon className="size-3 text-white" />
+            ) : (
+              <AddIcon className="size-3" />
+            )
+          }
           loading={todoPending}
         >
-          Create Todo
+          {data?.id ? "Edit Todo" : "Create Todo"}
         </Button>
       </div>
     </form>

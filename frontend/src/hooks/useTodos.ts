@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import apiEndPoints from "@/services/apiEndpoint";
 import { closeDrawer } from "@/store/slices/drawerSlice";
+import { setStats } from "@/store/slices/todoSlice";
 import { AppDispatch } from "@/store/store";
 import { TodoItem } from "@/types/todo";
 import {
@@ -8,6 +9,7 @@ import {
   useQueryClient,
   useInfiniteQuery,
   QueryFunctionContext,
+  useQuery,
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
@@ -18,6 +20,7 @@ export interface TodoPayload {
   description: string;
   dueDate: string;
   dueTime: string;
+  status?: string;
 }
 
 interface TodoFilters {
@@ -32,7 +35,7 @@ interface TodoPageResponse {
   hasMore: boolean;
   stats: {
     total: number;
-    pending: number;
+    upcoming: number;
     completed: number;
   };
 }
@@ -63,10 +66,11 @@ export const useGetListQuery = ({
   sortBy,
   sortOrder,
 }: TodoFilters) => {
+  const dispatch = useDispatch<AppDispatch>();
   return useInfiniteQuery<TodoPageResponse, Error>({
     queryKey: ["todos", search, status, sortBy, sortOrder],
     queryFn: async ({ pageParam = 1 }: QueryFunctionContext) => {
-      const res = await api.get("/api/todos", {
+      const res = await api.get(apiEndPoints.GET_ALL_TODO, {
         params: {
           page: pageParam,
           limit: 10,
@@ -82,5 +86,67 @@ export const useGetListQuery = ({
       return lastPage.hasMore ? (lastPageParam as number) + 1 : undefined;
     },
     initialPageParam: 1,
+    select: (data) => {
+      const stats = data.pages[0]?.stats;
+      if (stats) {
+        dispatch(
+          setStats({
+            total: stats.total,
+            upcoming: stats.upcoming,
+            completed: stats.completed,
+          })
+        );
+      }
+      return data;
+    },
+  });
+};
+
+export const useGetTodoById = (id: string | null) => {
+  return useQuery<TodoItem, Error>({
+    queryKey: ["todo", id],
+    queryFn: async () => {
+      const res = await api.get(apiEndPoints.GET_TODO_BY_ID(id!));
+      return res.data;
+    },
+    enabled: !!id,
+  });
+};
+
+export const useUpdateTodo = () => {
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch<AppDispatch>();
+
+  return useMutation({
+    mutationFn: async ({ id, ...data }: TodoPayload & { id: string }) => {
+      const res = await api.patch(apiEndPoints.GET_TODO_BY_ID(id!), data);
+      return res.data;
+    },
+    onSuccess: (data: { message: string }) => {
+      toast.success(data.message);
+      dispatch(closeDrawer());
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+    onError: (error: AxiosError) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
+};
+
+export const useDeleteTodo = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.delete(apiEndPoints.GET_TODO_BY_ID(id!));
+      return res.data;
+    },
+    onSuccess: (data: { message: string }) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+    onError: (error: AxiosError) => {
+      toast.error(error?.message || "Failed to delete todo");
+    },
   });
 };

@@ -12,6 +12,8 @@ import {
   useUpdateProfile,
   useUploadImage,
 } from "@/hooks/useUserProfile";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 interface ProfileFormData {
   name: string;
@@ -22,7 +24,10 @@ export default function ProfileDrawer() {
   const { data: userInfo } = useGetUserInfo();
   const { mutate: updateProfile, isPending: updateProfilePending } =
     useUpdateProfile();
-  const { mutate: uploadImage, isPending: isUploadingImage } = useUploadImage();
+  const { mutate: uploadImage } = useUploadImage();
+  const { completed, total, upcoming } = useSelector(
+    (state: RootState) => state.todo.stats
+  );
 
   const { logout } = useAuth();
 
@@ -61,17 +66,17 @@ export default function ProfileDrawer() {
     {
       id: 1,
       label: "All Todos",
-      value: 12,
+      value: total,
     },
     {
       id: 2,
       label: "Upcoming",
-      value: 12,
+      value: upcoming,
     },
     {
       id: 3,
       label: "Completed",
-      value: 12,
+      value: completed,
     },
   ];
 

@@ -6,6 +6,8 @@ const apiEndPoints = {
   UPDATE_PROFILE: "/user/profile",
   UPLOAD_PROFILE_IMAGE: "/user/upload",
   ADD_TODO: "/api/todos/add-todo",
+  GET_ALL_TODO: "/api/todos",
+  GET_TODO_BY_ID: (id: string) => `/api/todos/${id}`,
 };
 
 export default apiEndPoints;

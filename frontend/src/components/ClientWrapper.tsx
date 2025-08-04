@@ -16,8 +16,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { Provider as ReduxProvider } from "react-redux";
 
-import AngleArrow from "@@/icons/angle-arrow.svg";
-import CalenderIcon from "@@/icons/calender-icon.svg";
+import AngleArrow from "@@/icons/curved-angle-arrow.svg";
 import CloseEye from "@@/icons/eye-closed.svg";
 import OpenEye from "@@/icons/eye-open.svg";
 import { store } from "@/store/store";
@@ -119,11 +118,14 @@ function ClientWrapper({
       }),
       Select: Select.extend({
         defaultProps: {
-          rightSection: <AngleArrow />,
+          size: "lg",
+          rightSection: <AngleArrow className="size-6" />,
           withCheckIcon: false,
           rightSectionPointerEvents: "none",
           classNames: {
-            option: "!text-base ",
+            option: "!text-sm ",
+            label: "!font-normal !text-sm !text-custom-primary-black",
+            input: "!text-sm",
           },
         },
       }),

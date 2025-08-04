@@ -1,22 +1,17 @@
 "use client";
 import { Drawer } from "@mantine/core";
-import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { closeDrawer } from "@/store/slices/drawerSlice";
 import ProfileDrawer from "./ProfileDrawer";
 import AddTodo from "./AddTodo";
+import TodoDetail from "./TodoDetail";
+import NotificationView from "./NotificationView";
 
-const NotificationView = () => <div>You have new notifications.</div>;
-
-const TodoDetailView = ({ data }: { data?: unknown }) => (
-  <div>Todo Detail: {JSON.stringify(data)}</div>
-);
-
-const drawerComponents: Record<string, FC<{ data?: unknown }>> = {
+const drawerComponents = {
   profile: ProfileDrawer,
   notification: NotificationView,
-  todo_detail: TodoDetailView,
+  todo_detail: TodoDetail,
   add_todo: AddTodo,
 };
 
@@ -41,7 +36,7 @@ const DrawerContainer = () => {
       case "todo_detail":
         return "Todo Details";
       case "add_todo":
-        return "Add Todo";
+        return data?.id ? "Edit Todo" : "Add Todo";
       default:
         return "";
     }

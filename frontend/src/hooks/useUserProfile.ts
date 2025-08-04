@@ -37,7 +37,6 @@ export const useUpdateProfile = () => {
       return response.data;
     },
     onSuccess: async () => {
-      console.log("Profile updated successfully.");
       await queryClient.invalidateQueries({ queryKey: ["user-info"] });
     },
     onError: (error: AxiosError) => {
