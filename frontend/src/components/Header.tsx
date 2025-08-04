@@ -34,7 +34,7 @@ export default function Header() {
   const handleLogout = async () => {
     setLoadingLogout(true);
     try {
-      await logout();
+      logout();
       await signOut({ callbackUrl: apiEndPoints.SIGN_IN });
     } catch (error) {
       console.error("Logout failed:", error);
@@ -98,7 +98,7 @@ export default function Header() {
               color="red"
               inline
               label={upcomingTodos?.length}
-              disabled={upcomingTodos?.length === 0}
+              disabled={!upcomingTodos || upcomingTodos?.length === 0}
               size={16}
             >
               <BellIcon className="h-5 w-5" />

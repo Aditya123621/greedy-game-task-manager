@@ -66,7 +66,6 @@ export const useGetListQuery = ({
   sortBy,
   sortOrder,
 }: TodoFilters) => {
-  const dispatch = useDispatch<AppDispatch>();
   return useInfiniteQuery<TodoPageResponse, Error>({
     queryKey: ["todos", search, status, sortBy, sortOrder],
     queryFn: async ({ pageParam = 1 }: QueryFunctionContext) => {

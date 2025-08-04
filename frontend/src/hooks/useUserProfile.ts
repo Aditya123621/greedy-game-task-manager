@@ -1,9 +1,16 @@
 import api from "@/lib/api";
 import apiEndPoints from "@/services/apiEndpoint";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  QueryFunctionContext,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { User } from "next-auth";
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 interface ProfileFormData {
   name: string;
@@ -13,6 +20,28 @@ interface MeResponse {
   success: boolean;
   user: User;
   message?: string;
+}
+
+interface UserFilters {
+  search: string;
+  role: string;
+  sortBy: string;
+  sortOrder: string;
+}
+
+interface AdminUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: "user" | "super_admin";
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface AdminUsersResponse {
+  users: AdminUser[];
+  hasMore: boolean;
+  total: number;
 }
 
 export const useGetUserInfo = () => {
@@ -65,6 +94,52 @@ export const useUploadImage = () => {
     },
     onError: (error: AxiosError) => {
       console.error("Profile update failed:", error.message);
+    },
+  });
+};
+
+export const useGetUsersQuery = ({
+  search,
+  role,
+  sortBy,
+  sortOrder,
+}: UserFilters) => {
+  return useInfiniteQuery<AdminUsersResponse, Error>({
+    queryKey: ["all_users", search, role, sortBy, sortOrder],
+    queryFn: async ({ pageParam = 1 }: QueryFunctionContext) => {
+      const res = await api.get(apiEndPoints.GET_ALL_USERS, {
+        params: {
+          page: pageParam,
+          limit: 10,
+          search,
+          role,
+          sortBy,
+          sortOrder,
+        },
+      });
+      return res.data;
+    },
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      return lastPage.hasMore ? (lastPageParam as number) + 1 : undefined;
+    },
+    initialPageParam: 1,
+  });
+};
+
+export const useToggleUserRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.patch(apiEndPoints.UPDATE_USER_ROLE(id));
+      return res.data;
+    },
+    onSuccess: (data: { message: string }) => {
+      toast.success(data.message || "Role updated");
+      queryClient.invalidateQueries({ queryKey: ["all_users"] });
+    },
+    onError: (error: AxiosError) => {
+      toast.error(error?.message || "Failed to update role");
     },
   });
 };
