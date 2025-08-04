@@ -141,3 +141,49 @@ export const deleteTodo = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getNotificationTodos = async (req, res) => {
+  try {
+    const now = dayjs();
+    const inFourHours = now.add(4, "hour");
+
+    const todos = await Todo.find({
+      status: { $in: ["Upcoming", "Completed"] },
+    });
+
+    const notifications = [];
+
+    for (const todo of todos) {
+      const combinedDateTime = dayjs(
+        `${dayjs(todo.dueDate).format("YYYY-MM-DD")} ${todo.dueTime}`,
+        "YYYY-MM-DD HH:mm"
+      );
+
+      if (
+        (todo.status === "Upcoming" &&
+          combinedDateTime.isAfter(now) &&
+          combinedDateTime.isBefore(inFourHours)) ||
+        todo.status === "Completed"
+      ) {
+        notifications.push(todo);
+      }
+    }
+
+    notifications.sort((a, b) => {
+      const aDate = dayjs(
+        `${dayjs(a.dueDate).format("YYYY-MM-DD")} ${a.dueTime}`,
+        "YYYY-MM-DD HH:mm"
+      );
+      const bDate = dayjs(
+        `${dayjs(b.dueDate).format("YYYY-MM-DD")} ${b.dueTime}`,
+        "YYYY-MM-DD HH:mm"
+      );
+      return aDate - bDate;
+    });
+
+    res.status(200).json({ todos: notifications });
+  } catch (error) {
+    console.error("Error fetching notification todos:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

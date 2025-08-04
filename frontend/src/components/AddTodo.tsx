@@ -40,7 +40,6 @@ export default function AddTodo({ data }: { data: { id: string } }) {
   const { mutate: createTodo, isPending: todoPending } = useCreateTodo();
 
   const onSubmit = (formData: TodoFormData) => {
-    console.log(formData, dirtyFields, "datadatadatadata");
     if (data?.id) {
       updateTodo({
         id: data.id,

@@ -53,6 +53,7 @@ export function useCreateTodo() {
       toast.success(data.message);
       dispatch(closeDrawer());
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["upcomingTodos"] });
     },
     onError: (error: AxiosError) => {
       toast.error(error?.message || "Something went wrong");
@@ -126,6 +127,7 @@ export const useUpdateTodo = () => {
       toast.success(data.message);
       dispatch(closeDrawer());
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["upcomingTodos"] });
     },
     onError: (error: AxiosError) => {
       toast.error(error?.message || "Something went wrong");
@@ -135,6 +137,7 @@ export const useUpdateTodo = () => {
 
 export const useDeleteTodo = () => {
   const queryClient = useQueryClient();
+  const dispatch = useDispatch<AppDispatch>();
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -143,10 +146,25 @@ export const useDeleteTodo = () => {
     },
     onSuccess: (data: { message: string }) => {
       toast.success(data.message);
+      dispatch(closeDrawer());
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["upcomingTodos"] });
     },
     onError: (error: AxiosError) => {
       toast.error(error?.message || "Failed to delete todo");
     },
+  });
+};
+
+export const useUpcomingTodos = (shouldFetch: boolean) => {
+  return useQuery<TodoItem[]>({
+    queryKey: ["upcomingTodos"],
+    queryFn: async () => {
+      const res = await api.get(apiEndPoints.GET_UPCOMING_TODO);
+      return res.data.todos;
+    },
+    refetchInterval: 3 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
+    enabled: shouldFetch,
   });
 };

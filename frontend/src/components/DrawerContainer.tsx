@@ -32,7 +32,7 @@ const DrawerContainer = () => {
       case "profile":
         return "Profile";
       case "notification":
-        return "Notifications";
+        return "All Notifications";
       case "todo_detail":
         return "Todo Details";
       case "add_todo":

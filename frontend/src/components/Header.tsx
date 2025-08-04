@@ -3,18 +3,26 @@ import React, { Fragment, useState } from "react";
 import SearchIcon from "@@/icons/search-icon.svg";
 import BellIcon from "@@/icons/bell-icon.svg";
 import GreedyGameLogo from "@@/images/greedy-game-logo.svg";
-import { ActionIcon, Avatar, Button, Popover, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Avatar,
+  Button,
+  Indicator,
+  Popover,
+  TextInput,
+} from "@mantine/core";
 import { signOut, useSession } from "next-auth/react";
 import DropDownArrow from "@@/icons/curved-angle-arrow.svg";
 import ProfileIcon from "@@/icons/profile-icon.svg";
 import LogoutIcon from "@@/icons/logout-icon.svg";
 import { useAuth } from "@/hooks/useAuth";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 import { openDrawer } from "@/store/slices/drawerSlice";
 import apiEndPoints from "@/services/apiEndpoint";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { setSearch } from "@/store/slices/todoSlice";
+import { useUpcomingTodos } from "@/hooks/useTodos";
 
 export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,6 +30,8 @@ export default function Header() {
   const [opened, setOpened] = useState<boolean>(false);
   const { logout } = useAuth();
   const [loadingLogout, setLoadingLogout] = useState(false);
+  const isOpen = useSelector((state: RootState) => state.drawer.opened);
+  const { data: upcomingTodos } = useUpcomingTodos(!isOpen);
 
   const debouncedDispatch = useDebouncedCallback((val: string) => {
     dispatch(setSearch(val));
@@ -81,9 +91,20 @@ export default function Header() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <ActionIcon variant="transparent">
-            <BellIcon className="h-5 w-5" />
-          </ActionIcon>
+          <button
+            onClick={() => {
+              dispatch(openDrawer({ type: "notification" }));
+            }}
+          >
+            <Indicator
+              color="red"
+              inline
+              label={upcomingTodos?.length}
+              size={16}
+            >
+              <BellIcon className="h-5 w-5" />
+            </Indicator>
+          </button>
 
           <Popover
             opened={opened}

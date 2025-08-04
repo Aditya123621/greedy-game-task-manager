@@ -8,6 +8,7 @@ const apiEndPoints = {
   ADD_TODO: "/api/todos/add-todo",
   GET_ALL_TODO: "/api/todos",
   GET_TODO_BY_ID: (id: string) => `/api/todos/${id}`,
+  GET_UPCOMING_TODO: "/api/todos/upcoming",
 };
 
 export default apiEndPoints;

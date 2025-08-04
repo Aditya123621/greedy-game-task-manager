@@ -1,4 +1,4 @@
-import { useGetTodoById } from "@/hooks/useTodos";
+import { useDeleteTodo, useGetTodoById } from "@/hooks/useTodos";
 import { getStatusStyle } from "@/utils/getBadgeColor";
 import CalenderIcon from "@@/icons/calender-icon.svg";
 import FlagIcon from "@@/icons/flag-icon.svg";
@@ -12,6 +12,7 @@ import { openDrawer } from "@/store/slices/drawerSlice";
 import { useQueryClient } from "@tanstack/react-query";
 
 const TodoDetail = ({ data }: { data: { id: string } }) => {
+  const { mutate: deleteTodo } = useDeleteTodo();
   const queryClient = useQueryClient();
   const dispatch = useDispatch<AppDispatch>();
   const { data: todoData } = useGetTodoById(data?.id);
@@ -65,7 +66,12 @@ const TodoDetail = ({ data }: { data: { id: string } }) => {
         >
           <EditIcon className="size-6 text-[#657081]" />
         </ActionIcon>
-        <ActionIcon variant="transparent">
+        <ActionIcon
+          variant="transparent"
+          onClick={() => {
+            deleteTodo(data.id);
+          }}
+        >
           <DeleteIcon className="size-6 text-[#657081]" />
         </ActionIcon>
       </div>

@@ -4,7 +4,6 @@ import {
   Button,
   Table,
   Skeleton,
-  Text,
   Alert,
   Badge,
   ActionIcon,

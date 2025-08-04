@@ -80,8 +80,6 @@ export default function ProfileDrawer() {
     },
   ];
 
-  console.log(file, "filefilefile");
-
   useEffect(() => {
     if (userInfo) {
       reset({
