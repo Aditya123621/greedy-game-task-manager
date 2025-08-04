@@ -19,7 +19,7 @@ export const createTodo = async (req, res) => {
       description: description.trim(),
       dueDate: parsedDate.toDate(),
       dueTime,
-      user: req.user._id, // Associate with current user
+      user: req.user._id, 
     });
 
     await newTodo.save();
@@ -46,7 +46,7 @@ export const getTodos = async (req, res) => {
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const filter = { user: req.user._id }; // Scope to user
+    const filter = { user: req.user._id };
     if (search) {
       filter.title = { $regex: search, $options: "i" };
     }

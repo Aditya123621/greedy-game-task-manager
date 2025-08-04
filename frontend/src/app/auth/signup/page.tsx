@@ -52,7 +52,7 @@ export default function SignUp() {
     <div className="w-full max-w-md">
       <div className="text-center">
         <div className="flex items-center justify-center">
-          <CompanyLogo className="w-1/3 h-full" />
+          <CompanyLogo className="w-1/3 h-full text-black" />
         </div>
         <h2 className="text-3xl font-semibold text-custom-primary-black my-4 text-center">
           You&apos;re one click away from less busywork

@@ -62,7 +62,7 @@ export default function SignIn() {
     <div className="w-full max-w-md space-y-8">
       <div className="text-center">
         <div className="flex items-center justify-center mb-6">
-          <CompanyLogo className="w-1/3 h-full" />
+          <CompanyLogo className="w-1/3 h-full text-black" />
         </div>
         <h2 className="text-3xl font-semibold text-[#21252B] mb-2 ">
           Welcome to GGTodo

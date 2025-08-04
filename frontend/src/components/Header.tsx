@@ -63,11 +63,15 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm px-4 py-3 h-18">
+    <header
+      className={`fixed top-0 ${
+        userInfo?.role === "super_admin" ? "left-18" : "left-0"
+      } right-0 z-40 bg-white shadow-sm px-4 py-3 h-18`}
+    >
       <div className="max-w-8xl mx-auto flex items-center justify-between">
         <div className="flex gap-10">
           <div className="flex items-center">
-            <GreedyGameLogo className="w-40 h-full" />
+            <GreedyGameLogo className="w-40 h-full text-black" />
           </div>
 
           <TextInput
