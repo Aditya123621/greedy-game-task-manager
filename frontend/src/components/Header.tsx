@@ -3,15 +3,8 @@ import React, { Fragment, useState } from "react";
 import SearchIcon from "@@/icons/search-icon.svg";
 import BellIcon from "@@/icons/bell-icon.svg";
 import GreedyGameLogo from "@@/images/greedy-game-logo.svg";
-import {
-  ActionIcon,
-  Avatar,
-  Button,
-  Indicator,
-  Popover,
-  TextInput,
-} from "@mantine/core";
-import { signOut, useSession } from "next-auth/react";
+import { Avatar, Button, Indicator, Popover, TextInput } from "@mantine/core";
+import { signOut } from "next-auth/react";
 import DropDownArrow from "@@/icons/curved-angle-arrow.svg";
 import ProfileIcon from "@@/icons/profile-icon.svg";
 import LogoutIcon from "@@/icons/logout-icon.svg";
@@ -23,12 +16,13 @@ import apiEndPoints from "@/services/apiEndpoint";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { setSearch } from "@/store/slices/todoSlice";
 import { useUpcomingTodos } from "@/hooks/useTodos";
+import { useGetUserInfo } from "@/hooks/useUserProfile";
 
 export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
-  const { data: session } = useSession();
   const [opened, setOpened] = useState<boolean>(false);
   const { logout } = useAuth();
+  const { data: userInfo } = useGetUserInfo();
   const [loadingLogout, setLoadingLogout] = useState(false);
   const isOpen = useSelector((state: RootState) => state.drawer.opened);
   const { data: upcomingTodos } = useUpcomingTodos(!isOpen);
@@ -100,6 +94,7 @@ export default function Header() {
               color="red"
               inline
               label={upcomingTodos?.length}
+              disabled={upcomingTodos?.length === 0}
               size={16}
             >
               <BellIcon className="h-5 w-5" />
@@ -122,8 +117,8 @@ export default function Header() {
               >
                 <Avatar
                   color="primary"
-                  src={session?.user?.image}
-                  name={session?.user?.name as string}
+                  src={userInfo?.avatar}
+                  name={userInfo?.name as string}
                 />
                 <DropDownArrow
                   className={`size-4 transition-transform duration-300 ${

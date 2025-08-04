@@ -4,9 +4,9 @@ import { useForm, Controller } from "react-hook-form";
 import { TextInput, PasswordInput, Button, Checkbox } from "@mantine/core";
 import GoogleIcon from "@@/icons/google-icon.svg";
 import Link from "next/link";
-import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { signIn } from "next-auth/react";
+import CompanyLogo from "@@/images/greedy-game-logo.svg";
 
 interface SignUpFormData {
   fullName: string;
@@ -52,12 +52,7 @@ export default function SignUp() {
     <div className="w-full max-w-md">
       <div className="text-center">
         <div className="flex items-center justify-center">
-          <Image
-            src={"/images/greedy-game-logo.svg"}
-            width={140}
-            height={140}
-            alt="company-logo"
-          />
+          <CompanyLogo className="w-1/3 h-full" />
         </div>
         <h2 className="text-3xl font-semibold text-custom-primary-black my-4 text-center">
           You&apos;re one click away from less busywork

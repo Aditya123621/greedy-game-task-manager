@@ -1,7 +1,6 @@
 import api from "@/lib/api";
 import apiEndPoints from "@/services/apiEndpoint";
 import { closeDrawer } from "@/store/slices/drawerSlice";
-import { setStats } from "@/store/slices/todoSlice";
 import { AppDispatch } from "@/store/store";
 import { TodoItem } from "@/types/todo";
 import {
@@ -87,19 +86,6 @@ export const useGetListQuery = ({
       return lastPage.hasMore ? (lastPageParam as number) + 1 : undefined;
     },
     initialPageParam: 1,
-    select: (data) => {
-      const stats = data.pages[0]?.stats;
-      if (stats) {
-        dispatch(
-          setStats({
-            total: stats.total,
-            upcoming: stats.upcoming,
-            completed: stats.completed,
-          })
-        );
-      }
-      return data;
-    },
   });
 };
 

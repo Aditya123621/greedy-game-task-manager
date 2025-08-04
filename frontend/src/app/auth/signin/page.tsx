@@ -4,10 +4,10 @@ import { useForm, Controller } from "react-hook-form";
 import { TextInput, PasswordInput, Button, Checkbox } from "@mantine/core";
 import GoogleIcon from "@@/icons/google-icon.svg";
 import Link from "next/link";
-import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import CompanyLogo from "@@/images/greedy-game-logo.svg";
 
 interface SignInFormData {
   email: string;
@@ -62,12 +62,7 @@ export default function SignIn() {
     <div className="w-full max-w-md space-y-8">
       <div className="text-center">
         <div className="flex items-center justify-center mb-6">
-          <Image
-            src={"/images/greedy-game-logo.svg"}
-            width={140}
-            height={140}
-            alt="company-logo"
-          />
+          <CompanyLogo className="w-1/3 h-full" />
         </div>
         <h2 className="text-3xl font-semibold text-[#21252B] mb-2 ">
           Welcome to GGTodo

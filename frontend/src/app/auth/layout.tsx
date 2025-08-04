@@ -1,19 +1,12 @@
-import Image from "next/image";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
+import AuthLeftPanelImage from "@@/images/auth-panel-image.svg";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <Image
-          src="/images/auth-panel-image.svg"
-          alt="Authentication panel"
-          fill
-          className="object-cover"
-          priority
-        />
-      </div>
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
+    <div className="min-h-screen flex overflow-hidden">
+      <AuthLeftPanelImage className="hidden lg:block h-screen" />
+
+      <div className="flex-auto flex items-center justify-center p-6 lg:p-12 bg-white">
         {children}
       </div>
     </div>

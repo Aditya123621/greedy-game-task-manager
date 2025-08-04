@@ -33,6 +33,7 @@ import { useGetUserInfo } from "@/hooks/useUserProfile";
 import dayjs from "dayjs";
 import { getStatusStyle } from "@/utils/getBadgeColor";
 import { useQueryClient } from "@tanstack/react-query";
+import { setStats } from "@/store/slices/todoSlice";
 
 const Dashboard = () => {
   const queryClient = useQueryClient();
@@ -76,6 +77,19 @@ const Dashboard = () => {
     if (observerRef.current) observer.observe(observerRef.current);
     return () => observer.disconnect();
   }, [hasNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const stats = data?.pages?.[0]?.stats;
+    if (stats) {
+      dispatch(
+        setStats({
+          total: stats.total,
+          upcoming: stats.upcoming,
+          completed: stats.completed,
+        })
+      );
+    }
+  }, [data, dispatch]);
 
   const columnHelper = createColumnHelper<TodoItem>();
 

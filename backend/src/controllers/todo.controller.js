@@ -19,6 +19,7 @@ export const createTodo = async (req, res) => {
       description: description.trim(),
       dueDate: parsedDate.toDate(),
       dueTime,
+      user: req.user._id, // Associate with current user
     });
 
     await newTodo.save();
@@ -45,7 +46,7 @@ export const getTodos = async (req, res) => {
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const filter = {};
+    const filter = { user: req.user._id }; // Scope to user
     if (search) {
       filter.title = { $regex: search, $options: "i" };
     }
@@ -64,15 +65,20 @@ export const getTodos = async (req, res) => {
 
     const hasMore = skip + todos.length < total;
 
-    const pendingCount = await Todo.countDocuments({ status: "Upcoming" });
-    const completedCount = await Todo.countDocuments({ status: "Completed" });
-    const totalCount = pendingCount + completedCount;
+    const pendingCount = await Todo.countDocuments({
+      user: req.user._id,
+      status: "Upcoming",
+    });
+    const completedCount = await Todo.countDocuments({
+      user: req.user._id,
+      status: "Completed",
+    });
 
     res.json({
       todos,
       hasMore,
       stats: {
-        total: totalCount,
+        total: pendingCount + completedCount,
         upcoming: pendingCount,
         completed: completedCount,
       },
@@ -85,7 +91,11 @@ export const getTodos = async (req, res) => {
 
 export const getTodoById = async (req, res) => {
   try {
-    const todo = await Todo.findById(req.params.id);
+    const todo = await Todo.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    });
+
     if (!todo) {
       return res.status(404).json({ message: "Todo not found" });
     }
@@ -105,7 +115,7 @@ export const updateTodoById = async (req, res) => {
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    const todo = await Todo.findById(id);
+    const todo = await Todo.findOne({ _id: id, user: req.user._id });
 
     if (!todo) {
       return res.status(404).json({ message: "Todo not found." });
@@ -130,7 +140,11 @@ export const deleteTodo = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deleted = await Todo.findByIdAndDelete(id);
+    const deleted = await Todo.findOneAndDelete({
+      _id: id,
+      user: req.user._id,
+    });
+
     if (!deleted) {
       return res.status(404).json({ message: "Todo not found" });
     }
@@ -148,6 +162,7 @@ export const getNotificationTodos = async (req, res) => {
     const inFourHours = now.add(4, "hour");
 
     const todos = await Todo.find({
+      user: req.user._id,
       status: { $in: ["Upcoming", "Completed"] },
     });
 
