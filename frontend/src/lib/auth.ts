@@ -16,13 +16,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        console.log(
-          joinUrl(
-            process.env.NEXT_PUBLIC_BACKEND_BASEURL!,
-            apiEndPoints.SIGN_IN
-          ),
-          "joinurrlrlrlrlrlrlrl"
-        );
+
         try {
           const response = await axios.post(
             joinUrl(
@@ -71,7 +65,35 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, account, trigger }) {
+      if (account?.provider === "google" && user) {
+        try {
+          const response = await axios.post(
+            joinUrl(
+              process.env.NEXT_PUBLIC_BACKEND_BASEURL!,
+              apiEndPoints.GOOGLE_CALLBACK
+            ),
+            {
+              googleId: user.id,
+              email: user.email,
+              name: user.name,
+              avatar: user.image,
+            }
+          );
+
+          if (response.data.success) {
+            token.backendToken = response.data.token;
+            token.id = response.data.user._id;
+            token.user = response.data.user;
+            token.rememberMe = true;
+            token.createdAt = response.data.user.createdAt;
+            token.updatedAt = response.data.user.updatedAt;
+          }
+        } catch (error) {
+          console.error("Google auth callback error:", error);
+        }
+      }
+
       if (trigger === "update") {
         try {
           const { data } = await axios.get(
@@ -97,6 +119,8 @@ export const authOptions: NextAuthOptions = {
           email: user.email ?? "",
           role: user.role ?? "user",
         };
+        token.createdAt = user.createdAt;
+        token.updatedAt = user.updatedAt;
       }
 
       const now = Math.floor(Date.now() / 1000);
@@ -108,13 +132,15 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       session.backendToken = token.backendToken;
       session.rememberMe = token.rememberMe;
+
       session.user = {
         ...session.user,
         id: token.id as string,
         ...token.user,
-        createdAt: token.user?.createdAt ?? token.createdAt,
-        updatedAt: token.user?.updatedAt ?? token.updatedAt,
+        createdAt: token.createdAt,
+        updatedAt: token.updatedAt,
       };
+
       return session;
     },
   },
