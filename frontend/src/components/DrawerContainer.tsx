@@ -8,6 +8,11 @@ import AddTodo from "./AddTodo";
 import TodoDetail from "./TodoDetail";
 import NotificationView from "./NotificationView";
 
+interface DrawerData {
+  id?: string;
+  [key: string]: unknown;
+}
+
 const drawerComponents = {
   profile: ProfileDrawer,
   notification: NotificationView,
@@ -36,7 +41,7 @@ const DrawerContainer = () => {
       case "todo_detail":
         return "Todo Details";
       case "add_todo":
-        return data?.id ? "Edit Todo" : "Add Todo";
+        return (data as DrawerData)?.id ? "Edit Todo" : "Add Todo";
       default:
         return "";
     }
@@ -52,7 +57,7 @@ const DrawerContainer = () => {
         title: "!text-custom-primary-black !font-semibold !text-2xl",
       }}
     >
-      {ContentComponent ? <ContentComponent data={data} /> : null}
+      {ContentComponent ? <ContentComponent data={data as { id: string }} /> : null}
     </Drawer>
   );
 };

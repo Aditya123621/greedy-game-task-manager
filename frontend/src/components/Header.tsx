@@ -17,6 +17,7 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { setSearch } from "@/store/slices/todoSlice";
 import { useUpcomingTodos } from "@/hooks/useTodos";
 import { useGetUserInfo } from "@/hooks/useUserProfile";
+import Link from "next/link";
 
 export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
@@ -70,9 +71,9 @@ export default function Header() {
     >
       <div className="max-w-8xl mx-auto flex items-center justify-between">
         <div className="flex gap-10">
-          <div className="flex items-center">
+          <Link href={"/"}>
             <GreedyGameLogo className="w-40 h-full text-black" />
-          </div>
+          </Link>
 
           <TextInput
             size="md"

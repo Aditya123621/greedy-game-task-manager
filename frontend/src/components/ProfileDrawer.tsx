@@ -14,6 +14,7 @@ import {
 } from "@/hooks/useUserProfile";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import toast from "react-hot-toast";
 
 interface ProfileFormData {
   name: string;
@@ -43,7 +44,6 @@ export default function ProfileDrawer() {
     },
   });
 
-  const [file, setFile] = useState<File | null>(null);
   const [loadingLogout, setLoadingLogout] = useState(false);
 
   const handleLogout = async () => {
@@ -95,8 +95,14 @@ export default function ProfileDrawer() {
         <div className="flex items-center space-x-4">
           <FileButton
             onChange={(selectedFile) => {
-              setFile(selectedFile);
-              if (selectedFile) uploadImage(selectedFile);
+              if (!selectedFile) {
+                return;
+              }
+              if (selectedFile.size > 5 * 1024 * 1024) {
+                toast.error("Please upload file less than 5MB!");
+                return;
+              }
+              uploadImage(selectedFile);
             }}
             accept="image/png,image/jpeg"
           >

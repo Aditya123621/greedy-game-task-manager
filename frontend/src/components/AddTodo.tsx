@@ -27,7 +27,7 @@ export default function AddTodo({ data }: { data: { id: string } }) {
     control,
     handleSubmit,
     reset,
-    formState: { errors, dirtyFields },
+    formState: { errors },
   } = useForm<TodoFormData>({
     defaultValues: {
       title: "",

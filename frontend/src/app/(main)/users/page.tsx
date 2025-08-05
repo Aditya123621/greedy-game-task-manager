@@ -6,12 +6,12 @@ import {
   ColumnDef,
   SortingState,
 } from "@tanstack/react-table";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Button, Switch } from "@mantine/core";
 import FilterIcon from "@@/icons/filter-icon.svg";
 import AddIcon from "@@/icons/add-icon.svg";
 
-import { RootState, AppDispatch } from "@/store/store";
+import { RootState } from "@/store/store";
 import { TruncateAndProvideTooltip } from "@/components/TruncateAndProvideTooltip";
 import TanStackReusableTable, {
   createSortableHeader,
@@ -28,7 +28,6 @@ type UserItem = {
 };
 
 const UserTable = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const [sorting, setSorting] = useState<SortingState>([]);
   const search = useSelector((state: RootState) => state.todo.search);
   const { data: session } = useSession();
