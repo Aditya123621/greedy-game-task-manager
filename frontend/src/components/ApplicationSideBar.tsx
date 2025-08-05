@@ -15,7 +15,6 @@ const ApplicationSideBar = () => {
   const dispatch = useDispatch<AppDispatch>();
   const isOpen = useSelector((state: RootState) => state.common.isSidebarOpen);
   const pathName = usePathname();
-  console.log(pathName, "pathName");
 
   const navigationItems = [
     { icon: DashboardIcon, label: "Dashboard", href: "/" },
@@ -30,7 +29,6 @@ const ApplicationSideBar = () => {
         isOpen ? "w-80" : "w-18"
       } `}
       onMouseEnter={() => {
-        console.log("aisjdfijaisjdfijaisdf");
         dispatch(setSidebarOpen(true));
       }}
       onMouseLeave={() => dispatch(setSidebarOpen(false))}

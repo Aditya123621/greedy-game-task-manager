@@ -16,7 +16,13 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-
+        console.log(
+          joinUrl(
+            process.env.NEXT_PUBLIC_BACKEND_BASEURL!,
+            apiEndPoints.SIGN_IN
+          ),
+          "joinurrlrlrlrlrlrlrl"
+        );
         try {
           const response = await axios.post(
             joinUrl(

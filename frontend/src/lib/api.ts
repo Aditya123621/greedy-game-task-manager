@@ -27,6 +27,8 @@ const api: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
+console.log("Axios Base URL:", api.defaults.baseURL);
+
 let isLoggingOut = false;
 
 const createSessionMemoizer = (ttl = 600_000) => {

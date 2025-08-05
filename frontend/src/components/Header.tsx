@@ -96,6 +96,7 @@ export default function Header() {
             label={upcomingTodos?.length}
             disabled={!upcomingTodos || upcomingTodos?.length === 0}
             size={16}
+            classNames={{ root: "!cursor-pointer" }}
             onClick={() => {
               dispatch(openDrawer({ type: "notification" }));
             }}

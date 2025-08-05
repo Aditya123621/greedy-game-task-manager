@@ -22,7 +22,6 @@ export async function middleware(request: NextRequest) {
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
   }
-  console.log(isUserPage, token, "tokentokentokentokentokentoken");
 
   if (isAuthRoute) {
     return NextResponse.redirect(new URL("/", request.url));
