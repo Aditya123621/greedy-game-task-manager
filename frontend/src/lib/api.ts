@@ -47,10 +47,10 @@ const createSessionMemoizer = (ttl = 600_000) => {
   };
 };
 
-const memoizedGetSession = createSessionMemoizer();
+const getFreshSession = async () => await getSession();
 
 api.interceptors.request.use(async (config: CustomAxiosRequestConfig) => {
-  const session = await memoizedGetSession();
+  const session = await getFreshSession();
   const token = session?.backendToken ?? "";
 
   if (token) {
@@ -72,7 +72,8 @@ api.interceptors.response.use(
   async (error: AxiosError<ApiResponse>) => {
     document.body.style.cursor = "default";
 
-    const session = await memoizedGetSession();
+    const session = await getSession();
+
     const token = session?.backendToken ?? "";
     const status = error.response?.status;
 
