@@ -11,8 +11,8 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       role: "user" | "super_admin";
-      createdAt: string;
-      updatedAt: string;
+      createdAt?: string;
+      updatedAt?: string;
     };
   }
 
@@ -34,18 +34,16 @@ declare module "next-auth/jwt" {
   interface JWT {
     backendToken?: string;
     rememberMe?: boolean;
+    id?: string;
     createdAt?: string;
     updatedAt?: string;
-    id?: string;
     user?: {
-      _id: string;
       name: string;
       email: string;
       avatar?: string;
-      googleId?: string;
       role: "user" | "super_admin";
-      createdAt: string;
-      updatedAt: string;
+      createdAt?: string;
+      updatedAt?: string;
     };
   }
 }

@@ -19,7 +19,7 @@ export const createTodo = async (req, res) => {
       description: description.trim(),
       dueDate: parsedDate.toDate(),
       dueTime,
-      user: req.user._id, 
+      user: req.user._id,
     });
 
     await newTodo.save();
@@ -48,7 +48,10 @@ export const getTodos = async (req, res) => {
 
     const filter = { user: req.user._id };
     if (search) {
-      filter.title = { $regex: search, $options: "i" };
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
     }
     if (status) {
       filter.status = status;

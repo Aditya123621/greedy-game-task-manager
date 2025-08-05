@@ -65,62 +65,50 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account?.provider === "google" && user) {
+    async jwt({ token, user, trigger }) {
+      if (trigger === "update") {
         try {
-          const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASEURL}/auth/google/callback`,
-            {
-              googleId: user.id,
-              email: user.email,
-              name: user.name,
-              avatar: user.image,
-            }
+          const { data } = await axios.get(
+            joinUrl(
+              process.env.NEXT_PUBLIC_BACKEND_BASEURL!,
+              apiEndPoints.GET_USER_INFO
+            ),
+            { headers: { Authorization: `Bearer ${token.backendToken}` } }
           );
-
-          if (response.data.success) {
-            token.backendToken = response.data.token;
-            token.id = response.data.user._id;
-            token.user = response.data.user;
-            token.rememberMe = true;
-          }
-        } catch (error) {
-          console.error("Google auth callback error:", error);
+          token.user = data.user;
+          token.updatedAt = data.user.updatedAt;
+        } catch (err) {
+          console.error("Session update failed", err);
         }
       }
 
-      if (user?.token) {
-        token.backendToken = user.token;
-        token.id = user.id;
-        token.rememberMe = user.rememberMe;
-        token.createdAt = user.createdAt;
-        token.updatedAt = user.updatedAt;
+      if (user) {
+        token.backendToken = user.token ?? token.backendToken;
+        token.id = user.id ?? token.id;
+        token.rememberMe = user.rememberMe ?? token.rememberMe;
+        token.user = {
+          name: user.name ?? "",
+          email: user.email ?? "",
+          role: user.role ?? "user",
+        };
       }
 
-      if (token.rememberMe) {
-        token.exp = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
-      } else {
-        token.exp = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
-      }
+      const now = Math.floor(Date.now() / 1000);
+      token.exp = now + (token.rememberMe ? 30 * 86400 : 86400);
 
       return token;
     },
 
     async session({ session, token }) {
       session.backendToken = token.backendToken;
-
+      session.rememberMe = token.rememberMe;
       session.user = {
         ...session.user,
         id: token.id as string,
-        role: token.user?.role || "user",
-        createdAt:
-          token.user?.createdAt || token.createdAt || new Date().toISOString(),
-        updatedAt:
-          token.user?.updatedAt || token.updatedAt || new Date().toISOString(),
+        ...token.user,
+        createdAt: token.user?.createdAt ?? token.createdAt,
+        updatedAt: token.user?.updatedAt ?? token.updatedAt,
       };
-
-      session.rememberMe = token.rememberMe;
-
       return session;
     },
   },

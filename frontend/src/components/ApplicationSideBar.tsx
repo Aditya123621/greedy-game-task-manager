@@ -18,7 +18,7 @@ const ApplicationSideBar = () => {
   console.log(pathName, "pathName");
 
   const navigationItems = [
-    { icon: DashboardIcon, label: "Dashboard", href: "/", active: true },
+    { icon: DashboardIcon, label: "Dashboard", href: "/" },
     { icon: UserIcon, label: "Users", href: "/users" },
   ];
 
@@ -39,14 +39,6 @@ const ApplicationSideBar = () => {
         {isOpen ? (
           <div className="px-6 flex justify-between items-center gap-5">
             <GreedyGameLogo className="w-2/3 text-white h-full" />
-            {/* <ActionIcon
-              variant="transparent"
-              onClick={() => {
-                dispatch(setSidebarOpen(false));
-              }}
-            >
-              <LeftArrow className="size-7 pt-1" />
-            </ActionIcon> */}
           </div>
         ) : (
           <div>

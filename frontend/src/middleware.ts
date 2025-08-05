@@ -11,6 +11,7 @@ export async function middleware(request: NextRequest) {
   });
 
   const isAuthRoute = pathname.startsWith("/auth");
+  const isUserPage = pathname.startsWith("/users");
 
   if (!token) {
     if (isAuthRoute) {
@@ -21,8 +22,13 @@ export async function middleware(request: NextRequest) {
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
   }
+  console.log(isUserPage, token, "tokentokentokentokentokentoken");
 
-  if (token && isAuthRoute) {
+  if (isAuthRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (isUserPage && token.user?.role !== "super_admin") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

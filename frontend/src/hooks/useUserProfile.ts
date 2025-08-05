@@ -45,13 +45,23 @@ interface AdminUsersResponse {
 }
 
 export const useGetUserInfo = () => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
 
   return useQuery<User, Error>({
     queryKey: ["user-info"],
     queryFn: async () => {
       const res = await api.get<MeResponse>(apiEndPoints.GET_USER_INFO);
-      return res.data.user;
+      const userFromAPI = res.data.user;
+
+      if (
+        session?.user &&
+        (userFromAPI.name !== session.user.name ||
+          userFromAPI.role !== session.user.role)
+      ) {
+        await update();
+      }
+
+      return userFromAPI;
     },
     enabled: status === "authenticated" && !!session?.backendToken,
   });

@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Button } from "@mantine/core";
+import { Button, HoverCard } from "@mantine/core";
 
 interface ButtonProps {
   label: string;
@@ -13,6 +13,7 @@ interface ButtonProps {
   };
   color?: string;
   disabled?: boolean;
+  dropdownContent?: ReactNode;
 }
 
 interface SectionToolbarProps {
@@ -33,16 +34,25 @@ export const SectionToolbar = ({
       </h2>
       <div className="flex gap-3">
         {secondaryButton && (
-          <Button
-            size="md"
-            color={secondaryButton.color || "#F8F9FA"}
-            leftSection={secondaryButton.icon}
-            classNames={secondaryButton.classNames}
-            onClick={secondaryButton.onClick}
-            disabled={secondaryButton.disabled}
-          >
-            {secondaryButton.label}
-          </Button>
+          <HoverCard shadow="md">
+            <HoverCard.Target>
+              <Button
+                size="md"
+                color={secondaryButton.color || "#F8F9FA"}
+                leftSection={secondaryButton.icon}
+                classNames={secondaryButton.classNames}
+                onClick={secondaryButton.onClick}
+                disabled={secondaryButton.disabled}
+              >
+                {secondaryButton.label}
+              </Button>
+            </HoverCard.Target>
+            {secondaryButton.dropdownContent && (
+              <HoverCard.Dropdown>
+                {secondaryButton.dropdownContent}
+              </HoverCard.Dropdown>
+            )}
+          </HoverCard>
         )}
         {primaryButton && (
           <Button

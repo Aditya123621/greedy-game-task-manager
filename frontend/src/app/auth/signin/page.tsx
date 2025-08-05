@@ -156,7 +156,9 @@ export default function SignIn() {
                   onChange={onChange}
                   label="Remember me"
                   size="sm"
-                  className="text-sm text-gray-700"
+                  classNames={{
+                    label: "!cursor-pointer",
+                  }}
                 />
               )}
             />

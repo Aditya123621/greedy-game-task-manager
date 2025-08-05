@@ -177,6 +177,12 @@ const Dashboard = () => {
     }));
   };
 
+  const statusFilters = [
+    { label: "Completed", value: "Completed", color: "green" },
+    { label: "Upcoming", value: "Upcoming", color: "yellow" },
+    { label: "Clear", value: "", color: "gray" },
+  ];
+
   return (
     <div className="bg-[#FAFAFA] p-10 flex flex-col gap-6 flex-auto">
       {!userInfo?.name ? (
@@ -189,7 +195,7 @@ const Dashboard = () => {
       )}
 
       <div className="bg-white py-4 !rounded-lg shadow-sm overflow-hidden">
-        <div className="grid grid-cols-5 divide-x divide-gray-200">
+        <div className="grid grid-cols-3 xl:grid-cols-5 divide-x divide-gray-200">
           {isLoading
             ? [1, 2, 3].map((_, idx) => (
                 <div key={idx} className="bg-white px-6 py-2 space-y-2">
@@ -230,6 +236,31 @@ const Dashboard = () => {
             label: "Filter",
             icon: <FilterIcon className="size-5" />,
             classNames: { label: "!text-[#6A7383]", inner: "!px-4" },
+            dropdownContent: (
+              <div className="flex flex-col gap-3 p-2">
+                <h1 className="text-sm font-semibold">Filter By Status:</h1>
+                <div className="flex gap-2">
+                  {statusFilters.map((filter) => (
+                    <Button
+                      key={filter.label}
+                      size="lg"
+                      variant={
+                        filters.status === filter.value ? "filled" : "light"
+                      }
+                      color={filter.color}
+                      onClick={() =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          status: filter.value,
+                        }))
+                      }
+                    >
+                      {filter.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ),
           }}
           primaryButton={{
             label: "Add Todo",

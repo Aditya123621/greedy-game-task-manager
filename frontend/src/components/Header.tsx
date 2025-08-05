@@ -88,22 +88,19 @@ export default function Header() {
           />
         </div>
 
-        <div className="flex items-center space-x-4">
-          <button
+        <div className="flex items-center space-x-6">
+          <Indicator
+            color="red"
+            inline
+            label={upcomingTodos?.length}
+            disabled={!upcomingTodos || upcomingTodos?.length === 0}
+            size={16}
             onClick={() => {
               dispatch(openDrawer({ type: "notification" }));
             }}
           >
-            <Indicator
-              color="red"
-              inline
-              label={upcomingTodos?.length}
-              disabled={!upcomingTodos || upcomingTodos?.length === 0}
-              size={16}
-            >
-              <BellIcon className="h-5 w-5" />
-            </Indicator>
-          </button>
+            <BellIcon className="size-5" />
+          </Indicator>
 
           <Popover
             opened={opened}

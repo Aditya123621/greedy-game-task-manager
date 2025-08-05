@@ -168,6 +168,7 @@ export default function SignUp() {
                 error={errors.agreeToTerms?.message}
                 classNames={{
                   input: `${errors.agreeToTerms ? "!border-red-500" : ""} `,
+                  label: "!cursor-pointer",
                 }}
               />
             )}

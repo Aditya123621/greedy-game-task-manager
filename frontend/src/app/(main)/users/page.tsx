@@ -7,7 +7,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useDispatch, useSelector } from "react-redux";
-import { Skeleton, Switch } from "@mantine/core";
+import { Button, Switch } from "@mantine/core";
 import FilterIcon from "@@/icons/filter-icon.svg";
 import AddIcon from "@@/icons/add-icon.svg";
 
@@ -105,7 +105,7 @@ const UserTable = () => {
           ),
         }),
       ] as ColumnDef<UserItem>[],
-    [columnHelper, toggleRole]
+    [columnHelper, session?.user?.id, toggleRole]
   );
 
   const handleSortingChange = (newSorting: SortingState) => {
@@ -118,6 +118,12 @@ const UserTable = () => {
     }));
   };
 
+  const roleFilters = [
+    { label: "User", value: "user", color: "indigo" },
+    { label: "Super Admin", value: "super_admin", color: "red" },
+    { label: "Clear", value: "", color: "gray" },
+  ];
+
   return (
     <div className="bg-[#FAFAFA] p-10 flex flex-col gap-6 flex-auto">
       <div className="bg-white rounded-lg shadow-sm p-6 flex-auto flex flex-col">
@@ -127,7 +133,26 @@ const UserTable = () => {
             label: "Filter",
             icon: <FilterIcon className="size-5" />,
             classNames: { label: "!text-[#6A7383]", inner: "!px-4" },
-            disabled: true,
+            dropdownContent: (
+              <div className="flex flex-col gap-3 p-2">
+                <h1 className="text-sm font-semibold">Filter By Role:</h1>
+                <div className="flex gap-2">
+                  {roleFilters.map((role) => (
+                    <Button
+                      key={role.label}
+                      size="xs"
+                      variant={filters.role === role.value ? "filled" : "light"}
+                      color={role.color}
+                      onClick={() =>
+                        setFilters((prev) => ({ ...prev, role: role.value }))
+                      }
+                    >
+                      {role.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ),
           }}
           primaryButton={{
             label: "Add Users",
