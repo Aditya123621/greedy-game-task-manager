@@ -1,5 +1,10 @@
 import { Todo } from "../models/todo.model.js";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
+import timezone from "dayjs/plugin/timezone.js";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const createTodo = async (req, res) => {
   try {
@@ -161,7 +166,9 @@ export const deleteTodo = async (req, res) => {
 
 export const getNotificationTodos = async (req, res) => {
   try {
-    const now = dayjs();
+    const timezoneStr = "Asia/Kolkata";
+
+    const now = dayjs().tz(timezoneStr);
     const inFourHours = now.add(4, "hour");
 
     const todos = await Todo.find({
@@ -172,10 +179,18 @@ export const getNotificationTodos = async (req, res) => {
     const notifications = [];
 
     for (const todo of todos) {
-      const combinedDateTime = dayjs(
-        `${dayjs(todo.dueDate).format("YYYY-MM-DD")} ${todo.dueTime}`,
-        "YYYY-MM-DD HH:mm"
+      const dateStr = dayjs(todo.dueDate).format("YYYY-MM-DD");
+      const timeStr = todo.dueTime;
+
+      // Combine dueDate and dueTime in the specified timezone
+      const combinedDateTime = dayjs.tz(
+        `${dateStr} ${timeStr}`,
+        "YYYY-MM-DD HH:mm",
+        timezoneStr
       );
+
+      // Debug log (optional: comment/remove in production)
+      // console.log({ title: todo.title, combinedDateTime: combinedDateTime.format(), now: now.format(), inFourHours: inFourHours.format() });
 
       if (
         (todo.status === "Upcoming" &&
@@ -187,16 +202,19 @@ export const getNotificationTodos = async (req, res) => {
       }
     }
 
+    // Sort by datetime
     notifications.sort((a, b) => {
-      const aDate = dayjs(
+      const aDate = dayjs.tz(
         `${dayjs(a.dueDate).format("YYYY-MM-DD")} ${a.dueTime}`,
-        "YYYY-MM-DD HH:mm"
+        "YYYY-MM-DD HH:mm",
+        timezoneStr
       );
-      const bDate = dayjs(
+      const bDate = dayjs.tz(
         `${dayjs(b.dueDate).format("YYYY-MM-DD")} ${b.dueTime}`,
-        "YYYY-MM-DD HH:mm"
+        "YYYY-MM-DD HH:mm",
+        timezoneStr
       );
-      return aDate - bDate;
+      return aDate.valueOf() - bDate.valueOf();
     });
 
     res.status(200).json({ todos: notifications });

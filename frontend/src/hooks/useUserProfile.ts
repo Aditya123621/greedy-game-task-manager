@@ -72,7 +72,7 @@ export const useUpdateProfile = () => {
 
   return useMutation({
     mutationFn: async (data: ProfileFormData) => {
-      const response = await api.put(apiEndPoints.UPDATE_PROFILE, data.name);
+      const response = await api.put(apiEndPoints.UPDATE_PROFILE, data);
       return response.data;
     },
     onSuccess: async () => {
